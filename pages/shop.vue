@@ -4,7 +4,7 @@
     <section class="bg-black py-16 sm:py-24 md:py-32 px-4 sm:px-6">
       <div class="max-w-7xl mx-auto text-center">
         <h1 class="font-heading text-4xl sm:text-5xl md:text-6xl font-bold mb-4 sm:mb-6 text-white">Shop Our Collection</h1>
-        <p class="text-base sm:text-lg text-gray-400 mb-8 max-w-2xl mx-auto">
+        <p class="text-base sm:text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
           Discover our complete range of premium products carefully curated for quality and style.
         </p>
       </div>
@@ -73,7 +73,7 @@
           <input 
             type="email" 
             placeholder="Enter your email" 
-            class="px-4 py-3 rounded text-black focus:outline-none w-full sm:w-64"
+            class="px-4 py-3 rounded text-black bg-white border border-gray-300 focus:outline-none focus:border-black w-full sm:w-64 placeholder-gray-500"
           />
           <button class="bg-white text-black px-8 py-3 rounded font-semibold hover:bg-gray-200 transition whitespace-nowrap">
             Subscribe

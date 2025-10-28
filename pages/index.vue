@@ -57,14 +57,17 @@
         </p>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12">
-          <!-- Feature 1 -->
-          <div v-for="(feature, idx) in features" :key="idx" 
-            :ref="(el) => featureRefs[idx] = el"
-            :class="['flex gap-6 transition-all duration-700', visibleFeatures[idx] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8']">
-            <div class="flex-shrink-0 w-16 h-16 bg-black rounded-lg flex items-center justify-center text-white text-2xl">
+          <!-- Features Loop -->
+          <div 
+            v-for="(feature, idx) in features" 
+            :key="idx"
+            :ref="(el) => { if (el) featureRefs[idx] = el }"
+            :class="['flex gap-6 transition-all duration-700', visibleFeatures[idx] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8']"
+          >
+            <div class="flex-shrink-0 w-16 h-16 bg-black rounded-lg flex items-center justify-center text-white text-2xl flex-none">
               {{ feature.icon }}
             </div>
-            <div>
+            <div class="flex-1">
               <h3 class="font-heading text-xl sm:text-2xl font-bold text-black mb-3">{{ feature.title }}</h3>
               <p class="text-gray-600">{{ feature.description }}</p>
             </div>
@@ -87,9 +90,9 @@
           <div class="flex gap-3 sm:gap-6 overflow-x-auto pb-4 scroll-smooth px-4 sm:px-6" ref="carousel">
             <div v-for="product in products" :key="product.id" class="flex-shrink-0 w-5/6 sm:w-1/2 lg:w-1/4 group">
               <!-- Product Card -->
-              <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-2xl transition transform hover:scale-105 cursor-pointer h-72 sm:h-80 relative">
+              <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-2xl transition transform hover:scale-105 cursor-pointer flex flex-col h-full relative">
                 <!-- Image Container -->
-                <div class="relative w-full h-48 sm:h-64 bg-gray-300 overflow-hidden">
+                <div class="relative w-full h-48 sm:h-56 bg-gray-300 overflow-hidden flex-shrink-0">
                   <img 
                     v-if="product.image" 
                     :src="product.image" 
@@ -105,10 +108,10 @@
                 </div>
 
                 <!-- Product Info -->
-                <div class="p-3 sm:p-4">
-                  <h3 class="font-heading font-bold text-black truncate text-sm sm:text-base">{{ product.name }}</h3>
-                  <p class="text-2xl sm:text-3xl font-bold text-black mt-2">${{ product.price }}</p>
-                  <button class="mt-3 w-full bg-black text-white py-2 rounded text-xs sm:text-sm font-semibold hover:bg-gray-800 transition">
+                <div class="p-3 sm:p-4 flex flex-col flex-grow">
+                  <h3 class="font-heading font-bold text-black text-sm sm:text-base line-clamp-2 mb-2">{{ product.name }}</h3>
+                  <p class="text-xl sm:text-2xl font-bold text-black mb-3">£{{ product.price }}</p>
+                  <button class="mt-auto w-full bg-black text-white py-2 rounded text-xs sm:text-sm font-semibold hover:bg-gray-800 transition">
                     View Details
                   </button>
                 </div>
@@ -197,7 +200,18 @@ const carousel = ref(null)
 let autoScrollInterval = null
 const scrollAmount = 350
 
-// Sample products - replace with your actual data
+// Scroll reveal
+const featureRefs = ref([])
+const visibleFeatures = ref([false, false, false, false])
+
+const features = ref([
+  { icon: '✓', title: 'Premium Selection', description: 'Handpicked items from the world\'s finest manufacturers. We only stock products that meet our exacting standards.' },
+  { icon: '◆', title: 'Authentic Luxury', description: 'Every product is 100% authentic and verified. We guarantee the integrity of every item in our collection.' },
+  { icon: '★', title: 'Expert Curation', description: 'Our team of luxury experts carefully curates each collection to bring you the finest available options.' },
+  { icon: '✦', title: 'White Glove Service', description: 'Personalized support from order to delivery. We ensure a seamless experience at every touchpoint.' },
+])
+
+// Sample products
 const products = ref([
   { id: 1, name: 'Premium Collection', price: 299.99, image: '/images/picture-1.jpg' },
   { id: 2, name: 'Luxury Series', price: 399.99, image: '/images/picture-2.jpg' },
@@ -252,7 +266,7 @@ const startAutoScroll = () => {
         carousel.value.scrollLeft = 0
       }
     }
-  }, 4000) // Scroll every 4 seconds
+  }, 4000)
 }
 
 const stopAutoScroll = () => {
@@ -262,8 +276,31 @@ const stopAutoScroll = () => {
   }
 }
 
+// Scroll reveal observer
+const setupScrollObservers = () => {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        const index = featureRefs.value.indexOf(entry.target)
+        if (index !== -1 && entry.isIntersecting) {
+          visibleFeatures.value[index] = true
+        }
+      })
+    },
+    {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px',
+    }
+  )
+
+  featureRefs.value.forEach((el) => {
+    if (el) observer.observe(el)
+  })
+}
+
 onMounted(() => {
   startAutoScroll()
+  setTimeout(() => setupScrollObservers(), 100)
 })
 
 onUnmounted(() => {
