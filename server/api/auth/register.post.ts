@@ -1,21 +1,33 @@
+// server/api/auth/register.post.ts
 import { connectDB } from '~/server/db/connection'
 import User from '~/server/db/models/User'
 import bcrypt from 'bcryptjs'
+import mongoose from 'mongoose'
 
 export default defineEventHandler(async (event) => {
   try {
     await connectDB()
 
-    const { name, email, password } = await readBody(event)
+    const { email, name, password } = await readBody(event)
 
-    if (!name || !email || !password) {
+    if (!email || !name || !password) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Name, email and password are required'
+        statusMessage: 'Email, name, and password are required'
       })
     }
 
-    // Check if user exists
+    // Check if OTP was verified
+    const otpRecord = await mongoose.connection.collection('otps').findOne({ email })
+
+    if (!otpRecord || !otpRecord.verified) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Email not verified. Please verify OTP first.'
+      })
+    }
+
+    // Check if user already exists
     const existingUser = await User.findOne({ email })
     if (existingUser) {
       throw createError({
@@ -29,10 +41,13 @@ export default defineEventHandler(async (event) => {
 
     // Create user
     const user = await User.create({
-      name,
       email,
+      name,
       password: hashedPassword
     })
+
+    // Delete OTP record
+    await mongoose.connection.collection('otps').deleteOne({ email })
 
     return {
       success: true,
@@ -45,9 +60,14 @@ export default defineEventHandler(async (event) => {
     }
   } catch (error: any) {
     console.error('Register error:', error)
+
+    if (error.statusCode) {
+      throw error
+    }
+
     throw createError({
-      statusCode: error.statusCode || 500,
-      statusMessage: error.message || 'Registration failed'
+      statusCode: 500,
+      statusMessage: 'Failed to create account'
     })
   }
 })

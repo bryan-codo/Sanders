@@ -1,183 +1,263 @@
 <template>
-  <div class="w-full min-h-screen bg-black flex flex-col">
-    <!-- Login Form - Centered -->
-    <main class="flex-1 flex items-center justify-center px-4 sm:px-6 py-12">
-      <div class="w-full max-w-md">
-        <!-- Premium Card with Gradient Background -->
-        <div class="relative">
-          <!-- Decorative blur effect -->
-          <div class="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-2xl blur-xl"></div>
-          
-          <!-- Main Card -->
-          <div class="relative bg-gradient-to-br from-white to-gray-50 rounded-2xl p-8 sm:p-12 shadow-2xl border border-gray-100">
-            <!-- Header -->
-            <div class="text-center mb-8">
-              <h1 class="font-heading text-4xl font-bold text-black mb-2">Create Account</h1>
-              <p class="text-gray-600">Join Sanders Store today</p>
+  <div class="w-full">
+    <!-- Hero Section -->
+    <section class="bg-black py-16 sm:py-24 md:py-32 px-4 sm:px-6">
+      <div class="max-w-7xl mx-auto text-center">
+        <h1 class="font-heading text-4xl sm:text-5xl md:text-6xl font-bold mb-4 sm:mb-6 text-white">Create Account</h1>
+        <p class="text-base sm:text-lg text-gray-300">Join Sanders today</p>
+      </div>
+    </section>
+
+    <!-- Registration Section -->
+    <section class="bg-white py-16 sm:py-24 px-4 sm:px-6">
+      <div class="max-w-md mx-auto">
+        <!-- Step 1: Email -->
+        <div v-if="step === 1" class="space-y-6">
+          <h2 class="font-heading text-2xl font-bold text-black">Enter Your Email</h2>
+          <form @submit.prevent="sendOTP" class="space-y-4">
+            <div>
+              <label class="block text-sm font-semibold text-black mb-2">Email Address</label>
+              <input 
+                v-model="form.email" 
+                type="email" 
+                placeholder="john@example.com"
+                class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-black text-black bg-white"
+                required
+              />
             </div>
 
-            <form @submit.prevent="handleRegister" class="space-y-6">
-              <!-- Full Name Input -->
-              <div>
-                <label class="block text-sm font-semibold text-black mb-3">Full Name</label>
-                <div class="relative group">
-                  <input 
-                    v-model="form.name"
-                    type="text" 
-                    placeholder="John Doe"
-                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-black transition bg-white text-black placeholder-gray-400"
-                    required
-                  />
-                  <div class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 opacity-0 group-focus-within:opacity-10 transition -z-10"></div>
-                </div>
-              </div>
+            <button 
+              type="submit"
+              :disabled="isLoading"
+              class="w-full bg-black text-white py-3 rounded font-bold hover:bg-gray-800 transition disabled:bg-gray-400"
+            >
+              {{ isLoading ? 'Sending...' : 'Send OTP' }}
+            </button>
 
-              <!-- Email Input -->
-              <div>
-                <label class="block text-sm font-semibold text-black mb-3">Email Address</label>
-                <div class="relative group">
-                  <input 
-                    v-model="form.email"
-                    type="email" 
-                    placeholder="your@email.com"
-                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-black transition bg-white text-black placeholder-gray-400"
-                    required
-                  />
-                  <div class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 opacity-0 group-focus-within:opacity-10 transition -z-10"></div>
-                </div>
-              </div>
-
-              <!-- Password Input -->
-              <div>
-                <label class="block text-sm font-semibold text-black mb-3">Password</label>
-                <div class="relative group">
-                  <input 
-                    v-model="form.password"
-                    type="password" 
-                    placeholder="••••••••"
-                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-black transition bg-white text-black placeholder-gray-400"
-                    required
-                  />
-                  <div class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 opacity-0 group-focus-within:opacity-10 transition -z-10"></div>
-                </div>
-              </div>
-
-              <!-- Confirm Password Input -->
-              <div>
-                <label class="block text-sm font-semibold text-black mb-3">Confirm Password</label>
-                <div class="relative group">
-                  <input 
-                    v-model="form.confirmPassword"
-                    type="password" 
-                    placeholder="••••••••"
-                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-black transition bg-white text-black placeholder-gray-400"
-                    required
-                  />
-                  <div class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 opacity-0 group-focus-within:opacity-10 transition -z-10"></div>
-                </div>
-              </div>
-
-              <!-- Error Message -->
-              <div v-if="error" class="bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded">
-                <p class="font-semibold">Sign Up Failed</p>
-                <p class="text-sm">{{ error }}</p>
-              </div>
-
-              <!-- Loading State -->
-              <div v-if="loading" class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 px-4 py-3 rounded">
-                <p class="font-semibold">Creating account...</p>
-              </div>
-
-              <!-- Terms Agreement -->
-              <label class="flex items-start cursor-pointer">
-                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 mt-1" required>
-                <span class="ml-2 text-gray-600 text-sm">I agree to the <a href="#" class="text-black font-semibold hover:underline">Terms of Service</a> and <a href="#" class="text-black font-semibold hover:underline">Privacy Policy</a></span>
-              </label>
-
-              <!-- Register Button -->
-              <button 
-                type="submit"
-                :disabled="loading"
-                class="w-full bg-gradient-to-r from-black to-gray-800 text-white py-3 rounded-lg font-bold text-lg hover:from-gray-800 hover:to-black transition transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
-              >
-                {{ loading ? 'Creating Account...' : 'Create Account' }}
-              </button>
-            </form>
-
-            <!-- Divider -->
-            <div class="my-8 flex items-center">
-              <div class="flex-1 border-t border-gray-200"></div>
-              <span class="px-4 text-gray-500 text-sm font-medium">ALREADY HAVE AN ACCOUNT?</span>
-              <div class="flex-1 border-t border-gray-200"></div>
-            </div>
-
-            <!-- Login Link -->
+            <p v-if="error" class="text-red-600 text-sm">{{ error }}</p>
+            
             <p class="text-center text-gray-600">
-              Already signed up? 
-              <NuxtLink to="/login" class="text-black font-bold hover:text-gray-700 transition">Sign in here</NuxtLink>
+              Already have an account? 
+              <NuxtLink to="/login" class="text-blue-600 hover:underline font-semibold">Login</NuxtLink>
             </p>
-          </div>
+          </form>
+        </div>
+
+        <!-- Step 2: OTP Verification -->
+        <div v-if="step === 2" class="space-y-6">
+          <h2 class="font-heading text-2xl font-bold text-black">Verify OTP</h2>
+          <p class="text-gray-600 text-sm">We sent a code to <strong>{{ form.email }}</strong></p>
+          
+          <form @submit.prevent="verifyOTP" class="space-y-4">
+            <div>
+              <label class="block text-sm font-semibold text-black mb-2">Enter OTP Code</label>
+              <input 
+                v-model="form.otp" 
+                type="text" 
+                placeholder="000000"
+                maxlength="6"
+                class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-black text-black bg-white text-center text-2xl tracking-widest"
+                required
+              />
+              <p class="text-gray-600 text-xs mt-2">Code expires in {{ otpTimer }}s</p>
+            </div>
+
+            <button 
+              type="submit"
+              :disabled="isLoading"
+              class="w-full bg-black text-white py-3 rounded font-bold hover:bg-gray-800 transition disabled:bg-gray-400"
+            >
+              {{ isLoading ? 'Verifying...' : 'Verify OTP' }}
+            </button>
+
+            <button 
+              type="button"
+              @click="step = 1"
+              class="w-full bg-gray-200 text-black py-3 rounded font-bold hover:bg-gray-300 transition"
+            >
+              Back
+            </button>
+
+            <p v-if="error" class="text-red-600 text-sm">{{ error }}</p>
+          </form>
+        </div>
+
+        <!-- Step 3: Create Password -->
+        <div v-if="step === 3" class="space-y-6">
+          <h2 class="font-heading text-2xl font-bold text-black">Create Password</h2>
+          
+          <form @submit.prevent="createAccount" class="space-y-4">
+            <div>
+              <label class="block text-sm font-semibold text-black mb-2">Full Name</label>
+              <input 
+                v-model="form.name" 
+                type="text" 
+                placeholder="John Doe"
+                class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-black text-black bg-white"
+                required
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-black mb-2">Password</label>
+              <input 
+                v-model="form.password" 
+                type="password" 
+                placeholder="••••••••"
+                class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-black text-black bg-white"
+                required
+                minlength="6"
+              />
+              <p class="text-gray-600 text-xs mt-1">At least 6 characters</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-black mb-2">Confirm Password</label>
+              <input 
+                v-model="form.confirmPassword" 
+                type="password" 
+                placeholder="••••••••"
+                class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-black text-black bg-white"
+                required
+              />
+            </div>
+
+            <button 
+              type="submit"
+              :disabled="isLoading || form.password !== form.confirmPassword"
+              class="w-full bg-black text-white py-3 rounded font-bold hover:bg-gray-800 transition disabled:bg-gray-400"
+            >
+              {{ isLoading ? 'Creating Account...' : 'Create Account' }}
+            </button>
+
+            <p v-if="error" class="text-red-600 text-sm">{{ error }}</p>
+            <p v-if="success" class="text-green-600 text-sm">{{ success }}</p>
+          </form>
         </div>
       </div>
-    </main>
+    </section>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const loading = ref(false)
+const step = ref(1)
+const isLoading = ref(false)
 const error = ref('')
+const success = ref('')
+const otpTimer = ref(600)
+let timerInterval: any = null
 
-interface RegisterForm {
-  name: string
+interface Form {
   email: string
+  otp: string
+  name: string
   password: string
   confirmPassword: string
 }
 
-const form = ref<RegisterForm>({
-  name: '',
+const form = ref<Form>({
   email: '',
+  otp: '',
+  name: '',
   password: '',
   confirmPassword: ''
 })
 
-const handleRegister = async () => {
-  loading.value = true
-  error.value = ''
+onMounted(() => {
+  // Start timer when step 2 is reached
+})
 
+onUnmounted(() => {
+  if (timerInterval) clearInterval(timerInterval)
+})
+
+const sendOTP = async () => {
   try {
-    // Validate passwords match
+    isLoading.value = true
+    error.value = ''
+
+    const response = await $fetch<any>('/api/auth/send-otp', {
+      method: 'POST',
+      body: { email: form.value.email }
+    })
+
+    if (response?.success) {
+      step.value = 2
+      otpTimer.value = 600
+      startTimer()
+    }
+  } catch (err: any) {
+    error.value = err.data?.message || 'Failed to send OTP'
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const verifyOTP = async () => {
+  try {
+    isLoading.value = true
+    error.value = ''
+
+    const response = await $fetch<any>('/api/auth/verify-otp', {
+      method: 'POST',
+      body: { email: form.value.email, otp: form.value.otp }
+    })
+
+    if (response?.success) {
+      step.value = 3
+      if (timerInterval) clearInterval(timerInterval)
+    }
+  } catch (err: any) {
+    error.value = err.data?.message || 'Invalid OTP'
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const createAccount = async () => {
+  try {
     if (form.value.password !== form.value.confirmPassword) {
       error.value = 'Passwords do not match'
       return
     }
 
-    // Validate password length
-    if (form.value.password.length < 6) {
-      error.value = 'Password must be at least 6 characters'
-      return
-    }
+    isLoading.value = true
+    error.value = ''
 
     const response = await $fetch<any>('/api/auth/register', {
       method: 'POST',
       body: {
-        name: form.value.name,
         email: form.value.email,
+        name: form.value.name,
         password: form.value.password
       }
     })
 
-    // Redirect to login after successful registration
-    router.push('/login')
+    if (response?.success) {
+      success.value = 'Account created! Redirecting to login...'
+      setTimeout(() => {
+        router.push('/login')
+      }, 2000)
+    }
   } catch (err: any) {
-    error.value = err.data?.message || 'Registration failed. Please try again.'
-    console.error('Register error:', err)
+    error.value = err.data?.message || 'Failed to create account'
   } finally {
-    loading.value = false
+    isLoading.value = false
   }
+}
+
+const startTimer = () => {
+  timerInterval = setInterval(() => {
+    otpTimer.value--
+    if (otpTimer.value <= 0) {
+      clearInterval(timerInterval)
+      error.value = 'OTP expired. Please request a new one.'
+      step.value = 1
+    }
+  }, 1000)
 }
 </script>
