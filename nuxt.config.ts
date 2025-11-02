@@ -8,6 +8,10 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
+  runtimeConfig: {
+    jwtSecret: process.env.JWT_SECRET,
+    mongodbUri: process.env.MONGODB_URI
+  },
   modules: [
     '@nuxtjs/google-fonts',
     '@nuxt/eslint',
@@ -16,7 +20,7 @@ export default defineNuxtConfig({
     '@nuxt/test-utils',
     // Handles Tailwind v4 automatically
     '@nuxt/ui',
-    '@nuxtjs/google-fonts'
+    '@nuxtjs/google-fonts',
   ],
   css: ['~/assets/css/main.css'], //This is important 
   ui: {

@@ -27,9 +27,33 @@
 
           <!-- Right Section -->
           <div class="flex items-center gap-4 sm:gap-6 lg:gap-8">
-            <button class="text-base hover:text-gray-300 transition transform hover:scale-110">🔍</button>
-            <button class="text-base hover:text-gray-300 transition transform hover:scale-110">🛒</button>
-            <button class="text-base hover:text-gray-300 transition transform hover:scale-110">👤</button>
+            <!-- Search Button -->
+            <button class="text-base hover:text-gray-300 transition transform hover:scale-110" title="Search">
+              🔍
+            </button>
+
+            <!-- Cart Button with Badge -->
+            <NuxtLink 
+              to="/cart" 
+              class="text-base hover:text-gray-300 transition transform hover:scale-110 relative"
+              title="Shopping Cart"
+            >
+              🛒
+              <ClientOnly>
+                <span v-if="cartCount > 0" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {{ cartCount }}
+                </span>
+              </ClientOnly>
+            </NuxtLink>
+
+            <!-- Account Button -->
+            <NuxtLink 
+              to="/account" 
+              class="text-base hover:text-gray-300 transition transform hover:scale-110"
+              title="Account"
+            >
+              👤
+            </NuxtLink>
           </div>
         </div>
       </div>
@@ -47,7 +71,7 @@
           <div>
             <h3 class="font-bold mb-4">Shop</h3>
             <ul class="space-y-2 text-sm">
-              <li><a href="#" class="hover:underline">All Products</a></li>
+              <li><NuxtLink to="/shop" class="hover:underline">All Products</NuxtLink></li>
               <li><a href="#" class="hover:underline">New Arrivals</a></li>
               <li><a href="#" class="hover:underline">Best Sellers</a></li>
             </ul>
@@ -56,7 +80,7 @@
           <div>
             <h3 class="font-bold mb-4">Company</h3>
             <ul class="space-y-2 text-sm">
-              <li><a href="#" class="hover:underline">About Us</a></li>
+              <li><NuxtLink to="/about" class="hover:underline">About Us</NuxtLink></li>
               <li><a href="#" class="hover:underline">Careers</a></li>
               <li><a href="#" class="hover:underline">Press</a></li>
             </ul>
@@ -66,7 +90,7 @@
             <h3 class="font-bold mb-4">Support</h3>
             <ul class="space-y-2 text-sm">
               <li><a href="#" class="hover:underline">Help Center</a></li>
-              <li><a href="#" class="hover:underline">Contact Us</a></li>
+              <li><NuxtLink to="/contact" class="hover:underline">Contact Us</NuxtLink></li>
               <li><a href="#" class="hover:underline">Shipping</a></li>
             </ul>
           </div>
@@ -93,3 +117,13 @@
     </footer>
   </div>
 </template>
+
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useCart } from '~/composables/useCart'
+
+const { getItemCount } = useCart()
+
+// Show cart item count
+const cartCount = computed(() => getItemCount())
+</script>

@@ -43,7 +43,11 @@
               <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
                 <span>Product Image</span>
               </div>
-              <button class="absolute top-4 right-4 bg-black text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition transform hover:scale-110">
+              <button 
+                type="button"
+                class="absolute top-4 right-4 bg-black text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition transform hover:scale-110"
+                title="Add to wishlist"
+              >
                 ♥
               </button>
             </div>
@@ -53,8 +57,11 @@
               <h3 class="font-heading text-lg sm:text-xl font-semibold text-black mb-2">{{ product.name }}</h3>
               <p class="text-gray-600 text-sm mb-4">{{ product.description }}</p>
               <div class="flex items-center justify-between">
-                <p class="text-2xl font-bold text-black">${{ product.price }}</p>
-                <button class="bg-black text-white px-4 py-2 rounded text-sm font-semibold hover:bg-gray-800 transition">
+                <p class="text-2xl font-bold text-black">£{{ product.price.toFixed(2) }}</p>
+                <button 
+                  @click="handleAddToCart(product)"
+                  class="bg-black text-white px-4 py-2 rounded text-sm font-semibold hover:bg-gray-800 transition"
+                >
                   Add to Cart
                 </button>
               </div>
@@ -63,6 +70,14 @@
         </div>
       </div>
     </section>
+
+    <!-- Notification -->
+    <div 
+      v-if="showNotification"
+      class="fixed bottom-8 right-8 bg-green-600 text-white px-6 py-4 rounded-lg shadow-lg z-50 animate-fade-in"
+    >
+      ✓ {{ notification }}
+    </div>
 
     <!-- Newsletter Section -->
     <section class="bg-black py-16 sm:py-24 px-4 sm:px-6">
@@ -84,10 +99,27 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useCart } from '~/composables/useCart'
+import { useAuth } from '~/composables/useAuth'
+import { useRouter } from 'vue-router'
 
-const filteredProducts = ref([
+interface Product {
+  id: number
+  name: string
+  price: number
+  description: string
+  image: string
+}
+
+const { addToCart } = useCart()
+const { isAuthenticated, initAuth, isChecking } = useAuth()
+const router = useRouter()
+const showNotification = ref(false)
+const notification = ref('')
+
+const filteredProducts = ref<Product[]>([
   { id: 1, name: 'Premium Essentials', price: 99.99, description: 'High-quality everyday products', image: '/images/picture-1.jpg' },
   { id: 2, name: 'Luxury Collection', price: 199.99, description: 'Exclusive premium items', image: '/images/picture-2.jpg' },
   { id: 3, name: 'Classic Series', price: 79.99, description: 'Timeless design classics', image: '/images/picture-3.jpg' },
@@ -97,4 +129,47 @@ const filteredProducts = ref([
   { id: 7, name: 'Signature Range', price: 139.99, description: 'Our signature items', image: '/images/picture-7.jpg' },
   { id: 8, name: 'Starter Pack', price: 89.99, description: 'Perfect for beginners', image: '/images/picture-8.jpg' },
 ])
+
+// Initialize auth on component mount
+onMounted(async () => {
+  await initAuth()
+})
+
+const handleAddToCart = (product: Product) => {
+  // Check if user is authenticated
+  if (!isAuthenticated.value) {
+    notification.value = 'Please login to add items to cart'
+    showNotification.value = true
+    setTimeout(() => {
+      router.push('/login')
+    }, 1500)
+    return
+  }
+
+  // Add to cart
+  addToCart(product)
+  notification.value = `${product.name} added to cart!`
+  showNotification.value = true
+  
+  setTimeout(() => {
+    showNotification.value = false
+  }, 3000)
+}
 </script>
+
+<style scoped>
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+</style>
