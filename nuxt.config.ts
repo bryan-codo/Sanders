@@ -17,7 +17,7 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxt/image',
     '@nuxt/scripts',
-    '@nuxt/test-utils',
+    //'@nuxt/test-utils',
     // Handles Tailwind v4 automatically
     '@nuxt/ui',
     '@nuxtjs/google-fonts',
