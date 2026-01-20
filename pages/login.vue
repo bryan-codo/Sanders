@@ -102,6 +102,9 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  middleware: 'guests'  // 👈 This uses middleware/guest.ts
+})
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '~/composables/useAuth'

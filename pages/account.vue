@@ -69,6 +69,9 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  middleware: 'auth'  // 👈 This uses middleware/auth.ts
+})
 import { ref, onMounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 import { useRouter } from 'vue-router'

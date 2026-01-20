@@ -1,4 +1,4 @@
-// middleware/auth.ts
+// middleware/guest.ts
 export default defineNuxtRouteMiddleware(async (to, from) => {
   // Only run on client
   if (!import.meta.client) {
@@ -12,8 +12,8 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     await checkAuth()
   }
 
-  // If not authenticated, redirect to login
-  if (!isAuthenticated.value) {
-    return navigateTo('/login')
+  // If already authenticated, redirect to account
+  if (isAuthenticated.value) {
+    return navigateTo('/account')
   }
 })
